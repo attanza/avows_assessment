@@ -46,21 +46,21 @@ export function generalErrorExpect(body: any, errMessage: string): void {
   expect(body.meta.message).toEqual(errMessage);
 }
 
-export function showExpect<T>(body: any, resource: string): void {
+export function showExpect(body: any, resource: string): void {
   expect(body.meta).toBeDefined();
   expect(body.meta.status).toEqual(200);
   expect(body.meta.message).toEqual(`${resource} item retrieved`);
   expect(body.data).toBeDefined();
 }
 
-export function updateExpect<T>(body: any, resource: string): void {
+export function updateExpect(body: any, resource: string): void {
   expect(body.meta).toBeDefined();
   expect(body.meta.status).toEqual(200);
   expect(body.meta.message).toEqual(`${resource} updated`);
   expect(body.data).toBeDefined();
 }
 
-export function deleteExpect<T>(body: any, resource: string): void {
+export function deleteExpect(body: any, resource: string): void {
   expect(body.meta).toBeDefined();
   expect(body.meta.status).toEqual(200);
   expect(body.meta.message).toEqual(`${resource} deleted`);

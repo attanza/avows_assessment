@@ -8,7 +8,7 @@ import Product from './product.entity';
 export class ProductsService extends BaseRepo<Product> {
   constructor(
     @InjectRepository(Product)
-    private repository: Repository<Product>,
+    private repository: Repository<Product>
   ) {
     super(repository);
   }

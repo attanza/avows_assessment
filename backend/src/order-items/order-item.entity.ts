@@ -1,6 +1,5 @@
 import BaseIdEntity from 'src/database/base-id.entity';
 import Order from 'src/orders/order.entity';
-import ProductCategory from 'src/product-categories/product-category.entity';
 import Product from 'src/products/product.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
 

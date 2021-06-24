@@ -7,7 +7,7 @@ import User from './user.entity';
 export class UsersService extends BaseRepo<User> {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    private usersRepository: Repository<User>
   ) {
     super(usersRepository);
   }
@@ -19,7 +19,7 @@ export class UsersService extends BaseRepo<User> {
     }
     throw new HttpException(
       'User with this email does not exist',
-      HttpStatus.NOT_FOUND,
+      HttpStatus.NOT_FOUND
     );
   }
 }

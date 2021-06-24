@@ -33,7 +33,7 @@ export class ProductCategoriesController {
 
   @Post()
   async create(
-    @Body() data: CreateProductCategoryDto,
+    @Body() data: CreateProductCategoryDto
   ): Promise<ProductCategory> {
     await this.service.checkDuplicate('name', data.name);
     return this.service.create(data);
@@ -42,7 +42,7 @@ export class ProductCategoriesController {
   @Put(':id')
   async update(
     @Param() { id }: IdPipe,
-    @Body() data: UpdateProductCategoryDto,
+    @Body() data: UpdateProductCategoryDto
   ) {
     await this.service.checkDuplicate('name', data.name, id);
     return this.service.update(id, data);

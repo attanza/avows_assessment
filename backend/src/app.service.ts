@@ -45,7 +45,9 @@ export class AppService {
       const productToOrder: Product[] = [];
       const itemCount = faker.datatype.number({ min: 1, max: 5 });
       Array.from({ length: itemCount }).map(() => {
-        productToOrder.push(products[faker.datatype.number(products.length - 1)]);
+        productToOrder.push(
+          products[faker.datatype.number(products.length - 1)]
+        );
       });
       let amount = 0;
       const qty = faker.datatype.number({ min: 1, max: 5 });

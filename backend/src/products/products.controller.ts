@@ -23,7 +23,7 @@ import { ProductsService } from './products.service';
 export class ProductsController {
   constructor(
     private readonly service: ProductsService,
-    private readonly productCategoriesService: ProductCategoriesService,
+    private readonly productCategoriesService: ProductCategoriesService
   ) {}
 
   @Get()
@@ -57,7 +57,7 @@ export class ProductsController {
       promises.push(
         this.productCategoriesService.findOne({
           id: data.category,
-        }),
+        })
       );
     }
     promises.push(this.service.checkDuplicate('name', data.name, id));

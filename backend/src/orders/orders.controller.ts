@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import JwtAuthenticationGuard from 'src/auth/guards/jwt-authentication.guard';
 import { IdPipe } from 'src/utils/id.pipe';
 import { PaginationParams } from 'src/utils/paginationParams';
@@ -14,7 +24,10 @@ export class OrdersController {
 
   @Get()
   async all(@Query() query: PaginationParams) {
-    return this.service.paginate(query, 'code', ['orderItems', 'orderItems.product']);
+    return this.service.paginate(query, 'code', [
+      'orderItems',
+      'orderItems.product',
+    ]);
   }
   @Get('orders-dashboard')
   async dashboard() {

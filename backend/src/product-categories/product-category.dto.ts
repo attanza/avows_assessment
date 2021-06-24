@@ -9,5 +9,5 @@ export class CreateProductCategoryDto {
 }
 
 export class UpdateProductCategoryDto extends PartialType(
-  CreateProductCategoryDto,
+  CreateProductCategoryDto
 ) {}

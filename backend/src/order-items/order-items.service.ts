@@ -8,7 +8,7 @@ import OrderItem from './order-item.entity';
 export class OrderItemsService extends BaseRepo<OrderItem> {
   constructor(
     @InjectRepository(OrderItem)
-    private repository: Repository<OrderItem>,
+    private repository: Repository<OrderItem>
   ) {
     super(repository);
   }

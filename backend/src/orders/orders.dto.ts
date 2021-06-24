@@ -1,11 +1,5 @@
-import {
-  IsArray,
-  IsInt,
-  IsNotEmpty,
-  IsUUID,
-  ValidateNested,
-} from 'class-validator';
 import { Type } from 'class-transformer';
+import { IsInt, IsNotEmpty, IsUUID, ValidateNested } from 'class-validator';
 
 class OrderItemDto {
   @IsNotEmpty()

@@ -20,7 +20,11 @@ class RedisInstance {
     return process.env.REDIS_PREFIX;
   }
 
-  async set(key: string, value: any, exp: number = this.defaultExpiry): Promise<void> {
+  async set(
+    key: string,
+    value: any,
+    exp: number = this.defaultExpiry
+  ): Promise<void> {
     Logger.log(`SET ${key}`, 'REDIS');
     await this.redis.set(key, JSON.stringify(value), 'EX', exp);
   }

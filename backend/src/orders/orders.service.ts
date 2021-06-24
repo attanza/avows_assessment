@@ -49,7 +49,10 @@ export class OrdersService extends BaseRepo<Order> {
     const amount = this.calculateAmount(products, data);
 
     order.amount = amount;
-    await Promise.all([order.save(), this.orderItemsService.deleteBy({ orderId: order.id })]);
+    await Promise.all([
+      order.save(),
+      this.orderItemsService.deleteBy({ orderId: order.id }),
+    ]);
     await this.insertOrderItems(products, data, order);
     return this.show(order.id, ['orderItems', 'orderItems.product']);
   }
@@ -59,10 +62,17 @@ export class OrdersService extends BaseRepo<Order> {
     if (!order) {
       throw new BadRequestException('Order not found');
     }
-    await Promise.all([this.orderItemsService.deleteBy({ orderId: order.id }), this.delete(id)]);
+    await Promise.all([
+      this.orderItemsService.deleteBy({ orderId: order.id }),
+      this.delete(id),
+    ]);
   }
 
-  private async insertOrderItems(products: Product[], data: CreateOrderDto, order: Order) {
+  private async insertOrderItems(
+    products: Product[],
+    data: CreateOrderDto,
+    order: Order
+  ) {
     const orderItems = [];
     for (const p of products) {
       const prod = data.items.find((i) => i.productId === p.id);
