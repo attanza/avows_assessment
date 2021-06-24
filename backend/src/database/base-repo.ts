@@ -2,7 +2,15 @@ import { BadRequestException } from '@nestjs/common';
 import crypto from 'crypto';
 import { ESortMode, PaginationParams } from 'src/utils/paginationParams';
 import { Redis } from 'src/utils/redis';
-import { Between, Brackets, FindManyOptions, ILike, Not, ObjectLiteral, Repository } from 'typeorm';
+import {
+  Between,
+  Brackets,
+  FindManyOptions,
+  ILike,
+  Not,
+  ObjectLiteral,
+  Repository,
+} from 'typeorm';
 
 abstract class BaseRepo<T> {
   private readonly dbModel: Repository<T>;
@@ -14,8 +22,15 @@ abstract class BaseRepo<T> {
    * Read Data
    */
 
-  async paginate(query: PaginationParams, searchableKeys = '', relations?: string[]) {
-    const redisKey = this.getModelName() + '_' + crypto.createHash('md5').update(JSON.stringify(query)).digest('hex');
+  async paginate(
+    query: PaginationParams,
+    searchableKeys = '',
+    relations?: string[]
+  ) {
+    const redisKey =
+      this.getModelName() +
+      '_' +
+      crypto.createHash('md5').update(JSON.stringify(query)).digest('hex');
     const cache = await Redis.get(redisKey);
     if (cache) {
       return cache;
@@ -23,7 +38,8 @@ abstract class BaseRepo<T> {
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 10;
     const sortBy: any = query.sortBy || 'createdAt';
-    const sortMode: any = query.sortMode && query.sortMode === ESortMode.ASC ? 'ASC' : 'DESC';
+    const sortMode: any =
+      query.sortMode && query.sortMode === ESortMode.ASC ? 'ASC' : 'DESC';
     const options: FindManyOptions<T> = {
       take: limit,
       skip: (page - 1) * limit,
@@ -72,7 +88,9 @@ abstract class BaseRepo<T> {
 
     if (query.search && searchableKeys.length > 0) {
       const searchWhere: any[] = [];
-      searchableKeys.split(' ').map((key) => searchWhere.push({ [key]: ILike(`%${query.search}%`) }));
+      searchableKeys
+        .split(' ')
+        .map((key) => searchWhere.push({ [key]: ILike(`%${query.search}%`) }));
       where = searchWhere;
     }
 
@@ -133,7 +151,10 @@ abstract class BaseRepo<T> {
   async create<X>(data: X): Promise<T> {
     const newData = this.dbModel.create();
     this.dbModel.merge(newData, data);
-    await Promise.all([this.dbModel.save(newData), Redis.deletePattern(this.getModelName())]);
+    await Promise.all([
+      this.dbModel.save(newData),
+      Redis.deletePattern(this.getModelName()),
+    ]);
 
     return newData;
   }
@@ -147,7 +168,10 @@ abstract class BaseRepo<T> {
    */
 
   async update<X>(id: string, data: X): Promise<T> {
-    await Promise.all([this.dbModel.update(id, data), Redis.deletePattern(this.getModelName())]);
+    await Promise.all([
+      this.dbModel.update(id, data),
+      Redis.deletePattern(this.getModelName()),
+    ]);
     const updated = await this.dbModel.findOne(id);
     if (updated) {
       return updated;
@@ -164,7 +188,10 @@ abstract class BaseRepo<T> {
     if (!found) {
       throw new BadRequestException(`${this.dbModel.metadata.name} not found`);
     }
-    await Promise.all([this.dbModel.delete(id), Redis.deletePattern(this.getModelName())]);
+    await Promise.all([
+      this.dbModel.delete(id),
+      Redis.deletePattern(this.getModelName()),
+    ]);
   }
 
   async deleteBy(condition: any) {
