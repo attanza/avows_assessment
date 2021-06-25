@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import useError from '../hooks/useError';
 import { IUser } from '../interaces/user.interface';
 import api from '../utils/api';
@@ -26,7 +27,7 @@ const AuthProvider: React.FC = ({ children }) => {
   const parseError = useError();
   const [user, setUser] = useState<IUser | null>(null);
   const [authenticated, setAuthenticated] = useState(false);
-
+  const location = useLocation();
   const logout = async () => {
     try {
       await api.post('/logout', {});
@@ -50,7 +51,9 @@ const AuthProvider: React.FC = ({ children }) => {
     async function initFetch() {
       await getMe();
     }
-    initFetch();
+    if (location.pathname !== '/login') {
+      initFetch();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

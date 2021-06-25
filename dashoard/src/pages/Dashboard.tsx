@@ -4,8 +4,8 @@ import Orders from '../components/Orders';
 const Dashboard = () => {
   return (
     <Layout>
-      <DashboardCarts />
       <Orders />
+      <DashboardCarts />
     </Layout>
   );
 };
