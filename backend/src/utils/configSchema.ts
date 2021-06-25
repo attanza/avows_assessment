@@ -8,7 +8,7 @@ export const configSchema = () => {
     POSTGRES_USER: Joi.string().required(),
     POSTGRES_PASSWORD: Joi.string().required(),
     POSTGRES_DB: Joi.string().required(),
-    PORT: Joi.number(),
+    PORT: Joi.number().required(),
     JWT_SECRET: Joi.string().required(),
     JWT_EXPIRATION_TIME: Joi.string().required(),
     REDIS_URL: Joi.string().required(),
