@@ -4,23 +4,13 @@ import { useFiltering } from '../contexts/FilteringContext';
 const initialOperators = ['Select operator ...', 'eq', 'like', 'between'];
 
 const Filtering = () => {
-  const {
-    field,
-    setField,
-    operator,
-    setOperator,
-    fieldValue,
-    setFieldValue,
-    setApply,
-    secondFieldValue,
-    setSecondFieldValue,
-  } = useFiltering();
+  const { field, operator, fieldValue, secondFieldValue, dispatch, clearFilter } = useFiltering();
 
   const [operators, setOperators] = useState(initialOperators);
 
   const getOperators = (e: any): void => {
     const field = e.target.value;
-    setField(field);
+    dispatch({ type: 'set-field', payload: field });
     switch (field) {
       case 'amount':
         return setOperators(['Select operator ...', 'eq', 'between']);
@@ -45,14 +35,7 @@ const Filtering = () => {
   };
 
   const applyFilter = () => {
-    setApply(true);
-  };
-
-  const clearFilter = () => {
-    setField('');
-    setOperator('');
-    setFieldValue('');
-    setApply(true);
+    dispatch({ type: 'set-apply', payload: true });
   };
 
   return (
@@ -68,7 +51,7 @@ const Filtering = () => {
       <li className="mt-2">
         <select
           className="form-control"
-          onChange={(e: any) => setOperator(e.target.value)}
+          onChange={(e: any) => dispatch({ type: 'set-operator', payload: e.target.value })}
           value={operator}>
           {operators.map((o: string) => (
             <option value={o} key={o}>
@@ -82,7 +65,7 @@ const Filtering = () => {
           <input
             className="form-control"
             value={fieldValue}
-            onChange={(e: any) => setFieldValue(e.target.value)}
+            onChange={(e: any) => dispatch({ type: 'set-fieldValue', payload: e.target.value })}
             type={getInputType()}
           />
         </li>
@@ -92,7 +75,9 @@ const Filtering = () => {
           <input
             className="form-control"
             value={secondFieldValue}
-            onChange={(e: any) => setSecondFieldValue(e.target.value)}
+            onChange={(e: any) =>
+              dispatch({ type: 'set-secondFieldValue', payload: e.target.value })
+            }
             type={getInputType()}
           />
         </li>

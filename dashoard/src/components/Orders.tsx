@@ -30,7 +30,7 @@ const Orders = () => {
   const parseError = useError();
   const [data, setData] = useState<IPaginatedOrder>();
   const [loading, setLoading] = useState(false);
-  const { generateUrl, apply, setApply, page, setPage, limit, setLimit } = useUrlAddress();
+  const { generateUrl, apply, page, limit, dispatch } = useUrlAddress();
 
   const fetchData = async () => {
     try {
@@ -38,7 +38,7 @@ const Orders = () => {
       const resp = await api.get(generateUrl('/orders'));
       setData(resp);
       setLoading(false);
-      setApply(false);
+      dispatch({ type: 'set-apply', payload: false });
     } catch (error) {
       setLoading(false);
       parseError(error);
@@ -51,11 +51,11 @@ const Orders = () => {
   }, [apply, page, limit]);
 
   const handlePageChange = (page: number) => {
-    setPage(page);
+    dispatch({ type: 'set-page', payload: page });
   };
   const handlePerRowsChange = (newPerPage: number, page: number) => {
-    setPage(page);
-    setLimit(newPerPage);
+    dispatch({ type: 'set-page', payload: page });
+    dispatch({ type: 'set-limit', payload: newPerPage });
   };
 
   return (

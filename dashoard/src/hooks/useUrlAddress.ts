@@ -1,18 +1,8 @@
 import { useFiltering } from '../contexts/FilteringContext';
 
 const useUrlAddress = () => {
-  const {
-    field,
-    operator,
-    fieldValue,
-    apply,
-    setApply,
-    secondFieldValue,
-    page,
-    limit,
-    setPage,
-    setLimit,
-  } = useFiltering();
+  const { field, operator, fieldValue, apply, secondFieldValue, page, limit, dispatch } =
+    useFiltering();
   const generateUrl = (baseUrl: string): string => {
     let url = `${baseUrl}?page=${page}&limit=${limit}`;
     if (field && fieldValue && operator === 'like') {
@@ -24,10 +14,10 @@ const useUrlAddress = () => {
     if (field && fieldValue && secondFieldValue && operator === 'between') {
       url = url + `&between=${field},${fieldValue},${secondFieldValue}`;
     }
-    setApply(false);
+    dispatch({ type: 'set-apply', payload: false });
     return url;
   };
-  return { generateUrl, apply, setApply, page, setPage, limit, setLimit };
+  return { generateUrl, apply, dispatch, page, limit };
 };
 
 export default useUrlAddress;

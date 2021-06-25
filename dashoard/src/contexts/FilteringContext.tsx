@@ -1,20 +1,19 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useReducer } from 'react';
 
+type Action = {
+  type: string;
+  payload?: any;
+};
 type FilteringContextType = {
   field: string;
-  setField: React.Dispatch<React.SetStateAction<string>>;
   operator: string;
-  setOperator: React.Dispatch<React.SetStateAction<string>>;
   fieldValue: string | number;
-  setFieldValue: React.Dispatch<React.SetStateAction<string | number>>;
   secondFieldValue: string | number;
-  setSecondFieldValue: React.Dispatch<React.SetStateAction<string | number>>;
   apply: boolean;
-  setApply: React.Dispatch<React.SetStateAction<boolean>>;
   page: number;
-  setPage: React.Dispatch<React.SetStateAction<number>>;
   limit: number;
-  setLimit: React.Dispatch<React.SetStateAction<number>>;
+  dispatch: (value: Action) => void;
+  clearFilter: () => void;
 };
 
 const initialValue: FilteringContextType = {
@@ -25,43 +24,47 @@ const initialValue: FilteringContextType = {
   page: 1,
   limit: 10,
   apply: false,
-  setField: () => {},
-  setOperator: () => {},
-  setFieldValue: () => {},
-  setSecondFieldValue: () => {},
-  setApply: () => {},
-  setPage: () => {},
-  setLimit: () => {},
+  dispatch: (value: Action) => {},
+  clearFilter: () => {},
+};
+
+const filteringReducer = (state: FilteringContextType, action: Action) => {
+  switch (action.type) {
+    case 'set-field':
+      return { ...state, field: action.payload };
+    case 'set-operator':
+      return { ...state, operator: action.payload };
+    case 'set-fieldValue':
+      return { ...state, fieldValue: action.payload };
+    case 'set-secondFieldValue':
+      return { ...state, secondFieldValue: action.payload };
+    case 'set-page':
+      return { ...state, page: action.payload };
+    case 'set-limit':
+      return { ...state, limit: action.payload };
+    case 'set-apply':
+      return { ...state, apply: action.payload };
+    case 'clear-filter':
+      return {
+        ...state,
+        field: '',
+        operator: '',
+        fieldValue: '',
+        secondFieldValue: '',
+        apply: true,
+      };
+    default:
+      return state;
+  }
 };
 
 const FilteringContext = createContext(initialValue);
 
 const FilteringProvider: React.FC = ({ children }) => {
-  const [field, setField] = useState('');
-  const [operator, setOperator] = useState('');
-  const [fieldValue, setFieldValue] = useState<string | number>('');
-  const [secondFieldValue, setSecondFieldValue] = useState<string | number>('');
-  const [apply, setApply] = useState(false);
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [state, dispatch] = useReducer(filteringReducer, initialValue);
+  const clearFilter = () => dispatch({ type: 'clear-filter' });
   return (
-    <FilteringContext.Provider
-      value={{
-        field,
-        setField,
-        operator,
-        setOperator,
-        fieldValue,
-        setFieldValue,
-        apply,
-        setApply,
-        secondFieldValue,
-        setSecondFieldValue,
-        page,
-        setPage,
-        limit,
-        setLimit,
-      }}>
+    <FilteringContext.Provider value={{ ...state, dispatch, clearFilter }}>
       {children}
     </FilteringContext.Provider>
   );
