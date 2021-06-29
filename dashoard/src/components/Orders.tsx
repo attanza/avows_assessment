@@ -1,11 +1,11 @@
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
+import { useAuth } from '../contexts/AuthContext';
 import useError from '../hooks/useError';
 import useUrlAddress from '../hooks/useUrlAddress';
 import { IOrder, IPaginatedOrder } from '../interaces/order.iterface';
 import api from '../utils/api';
-import Spinner from './Spinner';
 
 const columns = [
   {
@@ -27,28 +27,33 @@ const columns = [
 ];
 
 const Orders = () => {
+  const theRequest = api.cancel();
   const parseError = useError();
-  const [data, setData] = useState<IPaginatedOrder>();
-  const [loading, setLoading] = useState(false);
+  const { authLoading } = useAuth();
+  const [data, setData] = useState<IPaginatedOrder | null>(null);
   const { generateUrl, apply, page, limit, dispatch } = useUrlAddress();
 
   const fetchData = async () => {
     try {
-      setLoading(true);
-      const resp = await api.get(generateUrl('/orders'));
+      const resp = await api.get(generateUrl('/orders'), { cancelToken: theRequest.token });
       setData(resp);
-      setLoading(false);
-      dispatch({ type: 'set-apply', payload: false });
     } catch (error) {
-      setLoading(false);
-      parseError(error);
+      if (api.isCancel(error)) {
+        console.log('get orders aborted');
+      } else {
+        parseError(error);
+      }
     }
   };
 
   useEffect(() => {
-    fetchData();
+    if (!authLoading) {
+      fetchData();
+    }
+    return () => theRequest.cancel();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apply, page, limit]);
+  }, [apply, page, limit, authLoading]);
 
   const handlePageChange = (page: number) => {
     dispatch({ type: 'set-page', payload: page });
@@ -75,10 +80,8 @@ const Orders = () => {
             paginationTotalRows={data.pagination.totalDocs}
             onChangeRowsPerPage={handlePerRowsChange}
             onChangePage={handlePageChange}
-            progressPending={loading}
             paginationPerPage={limit}
             paginationRowsPerPageOptions={[10, 25, 50, 100]}
-            progressComponent={<Spinner />}
           />
         )}
       </div>

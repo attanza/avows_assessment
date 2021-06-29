@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import AuthProvider from './contexts/AuthContext';
 import FilteringProvider from './contexts/FilteringContext';
@@ -10,11 +9,10 @@ const Routes = () => {
       <AuthProvider>
         <FilteringProvider>
           <Switch>
-            <Route path="/login">
-              <Login />
-            </Route>
-            <Route path="/" exact>
-              <Dashboard />
+            <Route path="/login" component={Login} />
+            <Route path="/" exact component={Dashboard} />
+            <Route path="*">
+              <div>404 Not found </div>
             </Route>
           </Switch>
         </FilteringProvider>

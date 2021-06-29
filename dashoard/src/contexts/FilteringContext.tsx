@@ -1,9 +1,6 @@
 import React, { createContext, useContext, useReducer } from 'react';
+import { IReducerAction } from '../interaces/reducers.interface';
 
-type Action = {
-  type: string;
-  payload?: any;
-};
 type FilteringContextType = {
   field: string;
   operator: string;
@@ -12,7 +9,7 @@ type FilteringContextType = {
   apply: boolean;
   page: number;
   limit: number;
-  dispatch: (value: Action) => void;
+  dispatch: (value: IReducerAction) => void;
   clearFilter: () => void;
 };
 
@@ -24,11 +21,11 @@ const initialValue: FilteringContextType = {
   page: 1,
   limit: 10,
   apply: false,
-  dispatch: (value: Action) => {},
+  dispatch: (value: IReducerAction) => {},
   clearFilter: () => {},
 };
 
-const filteringReducer = (state: FilteringContextType, action: Action) => {
+const filteringReducer = (state: FilteringContextType, action: IReducerAction) => {
   switch (action.type) {
     case 'set-field':
       return { ...state, field: action.payload };

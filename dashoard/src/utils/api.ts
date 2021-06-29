@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 
 class Api {
   constructor() {
@@ -10,8 +10,8 @@ class Api {
     axios.defaults.withCredentials = true;
   }
 
-  async get(url: string): Promise<any> {
-    return axios.get(url).then((r) => r.data);
+  async get(url: string, options?: AxiosRequestConfig): Promise<any> {
+    return axios.get(url, options).then((r) => r.data);
   }
   async post(url: string, data: any): Promise<any> {
     return axios.post(url, data).then((r) => r.data);
@@ -21,6 +21,14 @@ class Api {
   }
   async delete(url: string): Promise<any> {
     return axios.delete(url).then((r) => r.data);
+  }
+
+  cancel() {
+    return axios.CancelToken.source();
+  }
+
+  isCancel(error: any) {
+    return axios.isCancel(error);
   }
 
   async uploadImage(url: string, data: any) {

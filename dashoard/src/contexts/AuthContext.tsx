@@ -1,38 +1,48 @@
-import React, { createContext, useContext, useState } from 'react';
-import { useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useReducer } from 'react';
 import { useLocation } from 'react-router-dom';
 import useError from '../hooks/useError';
+import { IReducerAction } from '../interaces/reducers.interface';
 import { IUser } from '../interaces/user.interface';
 import api from '../utils/api';
 
 type AuthContextType = {
   user: IUser | null;
-  setUser: React.Dispatch<React.SetStateAction<IUser | null>>;
+  authLoading: boolean;
   logout: () => void;
   getMe: () => void;
-  authenticated: boolean;
+  dispatch: (value: IReducerAction) => void;
 };
 
-const initialValue: AuthContextType = {
+const initialState: AuthContextType = {
   user: null,
-  setUser: () => {},
+  authLoading: true,
   logout: () => {},
   getMe: () => {},
-  authenticated: false,
+  dispatch: (value: IReducerAction) => {},
 };
 
-const AuthContext = createContext(initialValue);
+const authReducer = (state: AuthContextType, action: IReducerAction) => {
+  switch (action.type) {
+    case 'set-user':
+      return { ...state, user: action.payload };
+    case 'set-auth-loading':
+      return { ...state, authLoading: action.payload };
+
+    default:
+      return state;
+  }
+};
+
+const AuthContext = createContext(initialState);
 
 const AuthProvider: React.FC = ({ children }) => {
   const parseError = useError();
-  const [user, setUser] = useState<IUser | null>(null);
-  const [authenticated, setAuthenticated] = useState(false);
+  const [state, dispatch] = useReducer(authReducer, initialState);
   const location = useLocation();
   const logout = async () => {
     try {
       await api.post('/logout', {});
-      setUser(null);
-      setAuthenticated(false);
+      dispatch({ type: 'set-user', payload: null });
     } catch (error) {
       console.log(error);
     }
@@ -41,24 +51,25 @@ const AuthProvider: React.FC = ({ children }) => {
   const getMe = async () => {
     try {
       const resp = await api.get('/me');
-      await Promise.all([setUser(resp), setAuthenticated(true)]);
+      dispatch({ type: 'set-user', payload: resp });
+      dispatch({ type: 'set-auth-loading', payload: false });
     } catch (error) {
       parseError(error);
     }
   };
 
   useEffect(() => {
-    async function initFetch() {
+    const fetchMe = async () => {
       await getMe();
-    }
+    };
     if (location.pathname !== '/login') {
-      initFetch();
+      fetchMe();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, logout, authenticated, setUser, getMe }}>
+    <AuthContext.Provider value={{ ...state, dispatch, logout, getMe }}>
       {children}
     </AuthContext.Provider>
   );
