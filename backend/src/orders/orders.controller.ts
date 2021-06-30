@@ -30,8 +30,8 @@ export class OrdersController {
     ]);
   }
   @Get('orders-dashboard')
-  async dashboard() {
-    return this.service.getForDashboard();
+  async dashboard(@Query() query: PaginationParams) {
+    return this.service.getForDashboard(query);
   }
   @Get(':id')
   async show(@Param() param: IdPipe): Promise<Order> {

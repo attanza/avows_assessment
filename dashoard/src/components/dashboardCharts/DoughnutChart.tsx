@@ -1,3 +1,4 @@
+import React from 'react';
 import { Doughnut } from 'react-chartjs-2';
 interface ITopProductOrder {
   product_name: string;
@@ -41,4 +42,4 @@ const DoughnutChart = ({ data }: Props) => {
   );
 };
 
-export default DoughnutChart;
+export default React.memo(DoughnutChart);

@@ -4,8 +4,8 @@ import Orders from '../components/Orders';
 const Dashboard: React.FC = () => {
   return (
     <Layout>
-      <Orders />
       <DashboardCarts />
+      <Orders />
     </Layout>
   );
 };

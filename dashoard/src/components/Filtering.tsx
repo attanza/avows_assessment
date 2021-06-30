@@ -1,16 +1,26 @@
 import { useState } from 'react';
 import { useFiltering } from '../contexts/FilteringContext';
+import { toast } from 'react-toastify';
 
 const initialOperators = ['Select operator ...', 'eq', 'like', 'between'];
 
 const Filtering = () => {
-  const { field, operator, fieldValue, secondFieldValue, dispatch, clearFilter } = useFiltering();
+  const {
+    field,
+    operator,
+    fieldValue,
+    secondFieldValue,
+    dispatch,
+    clearFilter,
+    resetFieldValues,
+  } = useFiltering();
 
   const [operators, setOperators] = useState(initialOperators);
 
   const getOperators = (e: any): void => {
     const field = e.target.value;
     dispatch({ type: 'set-field', payload: field });
+    resetFieldValues();
     switch (field) {
       case 'amount':
         return setOperators(['Select operator ...', 'eq', 'between']);
@@ -35,7 +45,11 @@ const Filtering = () => {
   };
 
   const applyFilter = () => {
-    dispatch({ type: 'set-apply', payload: true });
+    if (field === 'createdAt' && fieldValue > secondFieldValue) {
+      toast.error('first date value cannot greater than second date value');
+    } else {
+      dispatch({ type: 'set-apply', payload: true });
+    }
   };
 
   return (
@@ -51,7 +65,9 @@ const Filtering = () => {
       <li className="mt-2">
         <select
           className="form-control"
-          onChange={(e: any) => dispatch({ type: 'set-operator', payload: e.target.value })}
+          onChange={(e: any) =>
+            dispatch({ type: 'set-operator', payload: e.target.value })
+          }
           value={operator}>
           {operators.map((o: string) => (
             <option value={o} key={o}>
@@ -65,7 +81,9 @@ const Filtering = () => {
           <input
             className="form-control"
             value={fieldValue}
-            onChange={(e: any) => dispatch({ type: 'set-fieldValue', payload: e.target.value })}
+            onChange={(e: any) =>
+              dispatch({ type: 'set-fieldValue', payload: e.target.value })
+            }
             type={getInputType()}
           />
         </li>
@@ -76,7 +94,10 @@ const Filtering = () => {
             className="form-control"
             value={secondFieldValue}
             onChange={(e: any) =>
-              dispatch({ type: 'set-secondFieldValue', payload: e.target.value })
+              dispatch({
+                type: 'set-secondFieldValue',
+                payload: e.target.value,
+              })
             }
             type={getInputType()}
           />
@@ -89,7 +110,9 @@ const Filtering = () => {
         </button>
       </li>
       <li className="mt-2">
-        <button className="btn btn-outline-primary btn-block" onClick={clearFilter}>
+        <button
+          className="btn btn-outline-primary btn-block"
+          onClick={clearFilter}>
           Clear
         </button>
       </li>

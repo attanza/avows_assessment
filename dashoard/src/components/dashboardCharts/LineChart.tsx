@@ -1,3 +1,4 @@
+import React from 'react';
 import moment from 'moment';
 import { Line } from 'react-chartjs-2';
 interface IMonthlyOrder {
@@ -45,4 +46,4 @@ const LineChart = ({ data }: Props) => {
   );
 };
 
-export default LineChart;
+export default React.memo(LineChart);

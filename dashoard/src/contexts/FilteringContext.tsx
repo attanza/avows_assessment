@@ -11,6 +11,7 @@ type FilteringContextType = {
   limit: number;
   dispatch: (value: IReducerAction) => void;
   clearFilter: () => void;
+  resetFieldValues: () => void;
 };
 
 const initialValue: FilteringContextType = {
@@ -23,9 +24,13 @@ const initialValue: FilteringContextType = {
   apply: false,
   dispatch: (value: IReducerAction) => {},
   clearFilter: () => {},
+  resetFieldValues: () => {},
 };
 
-const filteringReducer = (state: FilteringContextType, action: IReducerAction) => {
+const filteringReducer = (
+  state: FilteringContextType,
+  action: IReducerAction
+) => {
   switch (action.type) {
     case 'set-field':
       return { ...state, field: action.payload };
@@ -50,6 +55,14 @@ const filteringReducer = (state: FilteringContextType, action: IReducerAction) =
         secondFieldValue: '',
         apply: true,
       };
+    case 'reset-fieldValues':
+      return {
+        ...state,
+        operator: '',
+        fieldValue: '',
+        secondFieldValue: '',
+        apply: false,
+      };
     default:
       return state;
   }
@@ -60,8 +73,11 @@ const FilteringContext = createContext(initialValue);
 const FilteringProvider: React.FC = ({ children }) => {
   const [state, dispatch] = useReducer(filteringReducer, initialValue);
   const clearFilter = () => dispatch({ type: 'clear-filter' });
+  const resetFieldValues = () => dispatch({ type: 'reset-fieldValues' });
+
   return (
-    <FilteringContext.Provider value={{ ...state, dispatch, clearFilter }}>
+    <FilteringContext.Provider
+      value={{ ...state, dispatch, clearFilter, resetFieldValues }}>
       {children}
     </FilteringContext.Provider>
   );

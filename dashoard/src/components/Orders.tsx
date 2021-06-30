@@ -35,12 +35,12 @@ const Orders = () => {
 
   const fetchData = async () => {
     try {
-      const resp = await api.get(generateUrl('/orders'), { cancelToken: theRequest.token });
+      const resp = await api.get(generateUrl('/orders'), {
+        cancelToken: theRequest.token,
+      });
       setData(resp);
     } catch (error) {
-      if (api.isCancel(error)) {
-        console.log('get orders aborted');
-      } else {
+      if (!api.isCancel(error)) {
         parseError(error);
       }
     }

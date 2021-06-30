@@ -4,8 +4,10 @@ import BaseRepo from 'src/database/base-repo';
 import { OrderItemsService } from 'src/order-items/order-items.service';
 import Product from 'src/products/product.entity';
 import { ProductsService } from 'src/products/products.service';
+import { PaginationParams } from 'src/utils/paginationParams';
 import { Redis } from 'src/utils/redis';
 import { In, Repository } from 'typeorm';
+import crypto from 'crypto';
 
 import Order from './order.entity';
 import { CreateOrderDto } from './orders.dto';
@@ -107,29 +109,52 @@ export class OrdersService extends BaseRepo<Order> {
     return amount;
   }
 
-  async getForDashboard() {
-    const redisKey = 'Order_For_Dashboard';
+  async getForDashboard(query: PaginationParams) {
+    const redisKey =
+      'Order_For_Dashboard_' +
+      crypto.createHash('md5').update(JSON.stringify(query)).digest('hex');
     const cache = await Redis.get(redisKey);
     if (cache) {
       return cache;
     }
+
+    const monthlyOrdersQB = this.repository
+      .createQueryBuilder('order')
+      .select('SUM(order.amount) as total')
+      .addSelect('extract(month from order.createdAt) as month')
+      .groupBy('month')
+      .orderBy('month');
+
+    const topProductsOrderedQB = this.repository
+      .createQueryBuilder('order')
+      .select(['product.name'])
+      .addSelect('SUM(qty) as totalQty')
+      .leftJoin('order.orderItems', 'orderItems')
+      .leftJoin('orderItems.product', 'product')
+      .groupBy('product.name')
+      .orderBy('totalQty', 'DESC');
+
+    if (query.between) {
+      const betweenSplit = query.between.split(',');
+      if (betweenSplit[0] === 'createdAt') {
+        monthlyOrdersQB.where(`order.createdAt >= :after`, {
+          after: betweenSplit[1],
+        });
+        monthlyOrdersQB.andWhere(`order.createdAt <= :before`, {
+          before: betweenSplit[2],
+        });
+        topProductsOrderedQB.where(`order.createdAt >= :after`, {
+          after: betweenSplit[1],
+        });
+        topProductsOrderedQB.andWhere(`order.createdAt <= :before`, {
+          before: betweenSplit[2],
+        });
+      }
+    }
+
     const [monthlyOrders, topProductsOrdered] = await Promise.all([
-      this.repository
-        .createQueryBuilder('order')
-        .select('SUM(order.amount) as total')
-        .addSelect('extract(month from order.createdAt) as month')
-        .groupBy('month')
-        .orderBy('month')
-        .getRawMany(),
-      this.repository
-        .createQueryBuilder('order')
-        .select(['product.name'])
-        .addSelect('SUM(qty) as totalQty')
-        .leftJoin('order.orderItems', 'orderItems')
-        .leftJoin('orderItems.product', 'product')
-        .groupBy('product.name')
-        .orderBy('totalQty', 'DESC')
-        .getRawMany(),
+      monthlyOrdersQB.getRawMany(),
+      topProductsOrderedQB.getRawMany(),
     ]);
     await Redis.set(redisKey, { monthlyOrders, topProductsOrdered });
 
